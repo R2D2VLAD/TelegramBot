@@ -1,5 +1,7 @@
 package com.example.telegrembot.listener;
 
+import com.example.telegrembot.entity.NotificationTask;
+import com.example.telegrembot.service.NotificationTaskService;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.UpdatesListener;
 import com.pengrad.telegrambot.model.Message;
@@ -9,6 +11,7 @@ import com.pengrad.telegrambot.response.SendResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.lang.Nullable;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.time.LocalDateTime;
@@ -19,17 +22,21 @@ import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@Component
 public class TelegramBotUpdateListener implements UpdatesListener {
 
     private final Logger logger = LoggerFactory.getLogger(TelegramBotUpdateListener.class);
 
-    private final Pattern pattern = Pattern.compile("(\\d{1,2}\\.\\d{1,2}\\.\\d{4} \\d{1,2}:\\d{2})\\s+([А-я\\d\\s.,!?:]+)");
+    private final Pattern pattern = Pattern.compile("\\d{1,2}\\.\\d{1,2}\\.\\d{4} \\d{1,2}:\\d{2} [А-я\\d\\s.,!?:]+");
 
     private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
     private final TelegramBot telegramBot;
 
-    public TelegramBotUpdateListener(TelegramBot telegramBot) {
+    private final NotificationTaskService notificationTaskService;
+
+    public TelegramBotUpdateListener(TelegramBot telegramBot, NotificationTaskService notificationTaskService) {
         this.telegramBot = telegramBot;
+        this.notificationTaskService = notificationTaskService;
     }
 
     @PostConstruct
@@ -47,10 +54,9 @@ public class TelegramBotUpdateListener implements UpdatesListener {
                 String text = message.text();
 
                 if ("/start".equals(text)) {
-                    sendMessage(chatId,
-                            """
-                                    Привет, придурок!
-                                    """);
+                    sendMessage(chatId, """
+                            Привет, придурок!
+                            """);
                 } else if (text != null) {
                     Matcher matcher = pattern.matcher(text);
                     if (matcher.find()) {
@@ -59,6 +65,12 @@ public class TelegramBotUpdateListener implements UpdatesListener {
                             sendMessage(chatId, "Неккоректный формат даты и/или времени!");
                         } else {
                             String text1 = matcher.group(2);
+                            NotificationTask notificationTask = new NotificationTask();
+                            notificationTask.setChatId(chatId);
+                            notificationTask.setMessage(text1);
+                            notificationTask.setNotificationDateTime(dateTime);
+                            notificationTaskService.save(notificationTask);
+                            sendMessage(chatId, "Задача успешно запланирована!");
                         }
                     } else {
                         sendMessage(chatId, "Неккоректный формат сообщения!");
@@ -79,7 +91,6 @@ public class TelegramBotUpdateListener implements UpdatesListener {
             return null;
         }
     }
-
     private void sendMessage(Long chatId, String message) {
         SendMessage sendMessage = new SendMessage(chatId, message);
         SendResponse sendResponse = telegramBot.execute(sendMessage);

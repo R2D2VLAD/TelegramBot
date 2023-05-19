@@ -1,0 +1,47 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-table-notification-task
+      author: vlad
+      changes:
+        - createTable:
+            tableName: notification_task
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: message
+                  type: varchar(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: notification_Date_Time
+                  type: timestamp
+                  constraints:
+                    nullable: false
+              - column:
+                  name: chat_Id
+                  type: int
+                  constraints:
+                    nullable: false
+
+  - changeSet:
+      id: add-data-notification-task
+      author: vlad
+      changes:
+        - insert:
+            tableName: notification_task
+            columns:
+              - column:
+                  name: message
+                  value: 'Купить мороженое'
+              - column:
+                  name: notification_Date_Time
+                  value: 28.12.2003 20:40
+              - column:
+                  name: chat_Id
+                  value: 1
