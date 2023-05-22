@@ -26,7 +26,10 @@ public class NotificationTaskTimer {
              notificationTaskRepository.findAllByNotificationDateTime(
                              LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES)
                      ).forEach(notificationTask -> {
-                     telegramBot.execute(new SendMessage(notificationTask.getChatId(), notificationTask.getMessage()));
+                     telegramBot.execute(
+                             new SendMessage(notificationTask.getChatId(),
+                                     "Настало время выполнить задачу! Желаю успешов и хорошего настроения!\uD83E\uDD17" +
+                                             "Ваша задача: " + notificationTask.getMessage()));
                      notificationTaskRepository.delete(notificationTask);
                  });
     }

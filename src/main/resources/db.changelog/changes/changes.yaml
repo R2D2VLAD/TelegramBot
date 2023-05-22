@@ -19,29 +19,12 @@ databaseChangeLog:
                   constraints:
                     nullable: false
               - column:
-                  name: notification_Date_Time
+                  name: notification_date_time
                   type: timestamp
                   constraints:
                     nullable: false
               - column:
-                  name: chat_Id
-                  type: int
+                  name: chat_id
+                  type: bigint
                   constraints:
                     nullable: false
-
-  - changeSet:
-      id: add-data-notification-task
-      author: vlad
-      changes:
-        - insert:
-            tableName: notification_task
-            columns:
-              - column:
-                  name: message
-                  value: 'Купить мороженое'
-              - column:
-                  name: notification_Date_Time
-                  value: 28.12.2003 20:40
-              - column:
-                  name: chat_Id
-                  value: 1

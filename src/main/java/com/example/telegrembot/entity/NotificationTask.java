@@ -17,8 +17,8 @@ public class NotificationTask {
     private Long id;
     @Column (name = "message")
     private String message;
-    @Column (name = "notification_Date_Time", nullable = false)
+    @Column (name = "notification_date_time", nullable = false)
     private LocalDateTime notificationDateTime;
-    @Column (name = "chat_Id", nullable = false)
+    @Column (name = "chat_id", nullable = false)
     private Long chatId;
 }
